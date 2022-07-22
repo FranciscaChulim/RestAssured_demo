@@ -25,7 +25,8 @@ public class ProjectScenarios {
         
         requestSpect = new RequestSpecBuilder().
             setBaseUri("https://api.todoist.com/rest/v1").
-            addHeader("Authorization", "Bearer 597d34dad7b067299872ed73e0ec280e975d03f1").
+            //replace "myTodoisToken" with your Todoist Token 
+            addHeader("Authorization", "Bearer myTodoisToken").
             addHeader("Content-Type", "application/json").
             build();
             

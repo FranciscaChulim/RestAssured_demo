@@ -25,6 +25,8 @@
 
 ## Running Tests 
 
+Before running you need to set the token 
+
 To run all the tests from the suite on testng.xml
 
 ```bash

@@ -15,6 +15,7 @@ public class Project {
 
     public Project(){
 
+        //Use valid project ids from Todoist 
         this.id=2295237117L;
         this.name="New Project";
         this.color=39;

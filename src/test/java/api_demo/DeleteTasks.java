@@ -10,6 +10,7 @@ import static io.restassured.RestAssured.*;
 
 public class DeleteTasks {
 
+    //Use valid task ids from Todoist 
     @DataProvider (name="taskToDelete")
     public static Object[][] taskToDelete(){
         return new Object[][] {
@@ -23,8 +24,9 @@ public class DeleteTasks {
 
         Response response =
         given().
-             header("Content-Type", "application/json").
-            header("Authorization", "Bearer 597d34dad7b067299872ed73e0ec280e975d03f1").
+            header("Content-Type", "application/json").
+            //replace "myTodoisToken" with your Todoist Token 
+            header("Authorization", "Bearer myTodoisToken").
             pathParam("id", id).
         when().
             delete("https://api.todoist.com/rest/v1/tasks/{id}").
