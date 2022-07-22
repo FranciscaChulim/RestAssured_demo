@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Rest Assured testing" verbose="2">
+    <test name="Projects">
+        <classes>
+            <class name="api_demo.ProjectScenarios"></class>
+        </classes>
+    </test>
+    <test name="Tasks">
+        <classes>
+            <class name="api_demo.TaskScenarios"></class>
+        </classes>
+    </test>
+</suite>
