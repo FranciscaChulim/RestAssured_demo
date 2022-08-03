@@ -32,6 +32,6 @@ public class DeleteTasks {
             delete("https://api.todoist.com/rest/v1/tasks/{id}").
         then().
             extract().response();
-        Assert.assertEquals(204, response.statusCode());
+        Assert.assertEquals(response.statusCode(),204);
     }
 }
