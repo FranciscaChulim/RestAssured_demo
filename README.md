@@ -25,7 +25,7 @@
 
 ## Running Tests 
 
-Before running you need to set the token 
+Before running you need to set your TODOIST token 
 
 To run all the tests from the suite on testng.xml
 

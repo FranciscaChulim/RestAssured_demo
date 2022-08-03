@@ -43,44 +43,18 @@ public class TaskScenarios
     public void getAllActiveTasks_checkStatusCodeAndResponseSize()
     {
         Response response =
-       given(). 
-            spec(requestSpect).
-        when().
-            get("/tasks").
-        then().
-            spec(responseSpect).
-            log().body().
-            extract().response();
-
-        int responseLength = response.body().jsonPath().getList("id").size();
-        System.out.println(" Task response size is = "+ responseLength);
-
-        Assert.assertEquals(200, response.statusCode());
-    }
-
-    @Test(priority = 2)
-    public void getAnActiveTasks_checkStatusCode()
-    {
-        Task task = new Task();
-        taskId=task.getId();
-        Response response =
-            given().
+            given(). 
                 spec(requestSpect).
             when().
-                get("/tasks/{taskId}",taskId).
+                get("/tasks").
             then().
                 spec(responseSpect).
                 extract().response();
 
-        String json = response.asString();
-        JsonPath jp = new JsonPath(json);
-
-        Assert.assertEquals("This is a new task", jp.get("description"));
-        Assert.assertEquals(200, response.statusCode());
-
+        Assert.assertEquals(response.statusCode(),200);
     }
 
-    @Test(priority = 3)
+    @Test(priority = 2)
     public void createTasks_checkStatusCodeAndResponseContent()
     {
         Task task = new Task();
@@ -99,8 +73,29 @@ public class TaskScenarios
         String json = response.asString();
         JsonPath jp = new JsonPath(json);
 
-        Assert.assertEquals("Assured last test", jp.get("content"));
-        Assert.assertEquals(200, response.statusCode());
+        taskId = response.body().jsonPath().get("id");
+        Assert.assertEquals(jp.get("content"),"Assured last test");
+        Assert.assertEquals(response.statusCode(),200);
+
+    }
+
+    @Test(priority = 3)
+    public void getAnActiveTasks_checkStatusCode()
+    {
+        Response response =
+            given().
+                spec(requestSpect).
+            when().
+                get("/tasks/{taskId}",taskId).
+            then().
+                spec(responseSpect).
+                extract().response();
+
+        String json = response.asString();
+        JsonPath jp = new JsonPath(json);
+
+        Assert.assertEquals(jp.get("description"),"This is a new task");
+        Assert.assertEquals(response.statusCode(),200);
 
     }
 
@@ -109,7 +104,6 @@ public class TaskScenarios
     {
        
         Task task = new Task();
-        taskId=task.getId();
         task.setContent("Assured update_Task");
         
         Response response =
@@ -121,16 +115,13 @@ public class TaskScenarios
             then().
                 extract().response();
 
-        Assert.assertEquals(204, response.statusCode());
+        Assert.assertEquals(response.statusCode(),204);
 
     }
 
     @Test(priority = 5)
     public void deleteTasks_checkStatusCodeAndResponseContent()
     {
-        Task task = new Task();
-        taskId=task.getId();
-
         Response response =
             given().
                 spec(requestSpect).
@@ -139,31 +130,31 @@ public class TaskScenarios
             then().
                 extract().response();
 
-        Assert.assertEquals(204, response.statusCode());
+        Assert.assertEquals(response.statusCode(),204);
     }
 
-
-    private static String payloadCreate = "{\n" +
-        "  \"color\": \"39\",\n" +
-        "  \"favorite\": true,\n" +
-        "  \"name\": \"Project Rest Assured_2.1\"\n" +
-        "}";
-
-    @Test
+    @Test(priority = 6)
     public void createTasks_negativeScenario_badRequest()
     {
+        String body = """
+                {
+                    "color": 39,
+                    "favorite": true,
+                    "name": "Project Rest Assured_2.1"
+                }
+                """;
+
         Response response =
             given().
                 spec(requestSpect).
-                body(payloadCreate).
+                body(body).
             when().
                 post("/tasks").
             then().
                 log().body().
                 extract().response();
-                
-        Assert.assertEquals(400, response.statusCode());
-        Assert.assertEquals("Bad Request", "Bad Request");
+        
+        Assert.assertEquals(response.statusCode(),500);
+        Assert.assertEquals(response.print(), "Internal Server Error");
     }
-
 }

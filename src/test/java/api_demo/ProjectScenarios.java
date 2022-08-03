@@ -40,32 +40,33 @@ public class ProjectScenarios {
             build();
     }
     
-    @Test
+        
+    @Test(priority = 1)
     public void getProjects_checkStatusCodeAndResponseSize()
     {
         Response response =
-        given().
-            spec(requestSpect).
-        when().
-            get("/projects").
-        then().
-            spec(responseSpect).
-            extract().response();
+            given().
+                spec(requestSpect).
+            when().
+                get("/projects").
+            then().
+                spec(responseSpect).
+                log().body().
+                extract().response();
 
-        int responseLength = response.body().jsonPath().getList("id").size();
-        System.out.println(" The response size is = "+ responseLength);
-
-        Assert.assertEquals(200, response.statusCode());
-        Assert.assertEquals("application/json", response.contentType());
-        //Assert.assertEquals(2, responseLength);
+        Boolean containsInboxProject = response.body().jsonPath().getList("name").contains("Inbox");
+        
+        Assert.assertEquals(containsInboxProject, true);
+        Assert.assertEquals(response.statusCode(), 200);
+        Assert.assertEquals(response.contentType(),"application/json");
     }
 
-    @Test
+    @Test(priority = 2)
     public void createProject_checkStatusCodeAndResponseContent()
     {
         //serialization
         Project project = new Project();
-        project.setName("Name project 1");
+        project.setName("Demo project");
 
         Response response =
             given().
@@ -82,18 +83,15 @@ public class ProjectScenarios {
         JsonPath jp = new JsonPath(json);
 
         projectId = response.body().jsonPath().get("id");
-        project.setId(projectId);
-        System.out.println(" projectId = "+ projectId);
-        Assert.assertEquals("Name project 1", jp.get("name"));
-        Assert.assertEquals(200, response.statusCode());
-        Assert.assertEquals("application/json", response.contentType());
+
+        Assert.assertEquals(jp.get("name"),"Demo project");
+        Assert.assertEquals(response.statusCode(),200);
+        Assert.assertEquals(response.contentType(),"application/json");
     }
 
-    @Test
+    @Test(priority = 3)
     public void getAProject_checkStatusCodeAndResponseContent()
     {
-        Project project = new Project();
-        projectId=project.getId();
         Response response =
             given().
                 spec(requestSpect).
@@ -106,14 +104,15 @@ public class ProjectScenarios {
         String json = response.asString();
         JsonPath jp = new JsonPath(json);
 
-        Assert.assertEquals("Demo Project", jp.get("name"));
+        Assert.assertEquals(response.statusCode(),200);
+        Assert.assertEquals(jp.get("name"),"Demo project");
+        Assert.assertEquals(jp.get("favorite"),true);
     }
 
-    @Test
+    @Test(priority = 4)
     public void updateProject_checkStatusCode()
     {
         Project project = new Project();
-        projectId=project.getId();
         project.setName("Assured update_Project");
         
         Response response =
@@ -125,16 +124,13 @@ public class ProjectScenarios {
             then().
                 extract().response();
 
-        Assert.assertEquals(204, response.statusCode());
+        Assert.assertEquals(response.statusCode(),204);
 
     }
 
-    @Test
+    @Test(priority = 5)
     public void deleteProject_checkStatusCode()
     {
-        Project project = new Project();
-        projectId=project.getId();
-        
         Response response =
             given().
                 spec(requestSpect).
@@ -143,30 +139,31 @@ public class ProjectScenarios {
             then().
                 extract().response();
 
-        Assert.assertEquals(204, response.statusCode());
+        Assert.assertEquals(response.statusCode(),204);
 
     }
 
-    private static String payloadCreate = "{\n" +
-        "  \"color\": \"green\",\n" +
-        "  \"content\": \"Project Rest Assured_2.1\"\n" +
-        "}";
-
-    @Test
+    @Test(priority = 6)
     public void createProject_negativeScenario_badRequest()
     {
+        String body = """
+                {
+                    "color": "green",
+                    "projectName": "Project Rest Assured_2.1" 
+                }
+                """;
 
         Response response =
             given().
                 spec(requestSpect).
-                body(payloadCreate).
+                body(body).
             when().
                 post("/projects").
             then().
+                log().body().
                 extract().response();
-                
-        Assert.assertEquals(400, response.statusCode());
-        Assert.assertEquals("Bad Request", "Bad Request");
+        Assert.assertEquals(response.statusCode(),500);
+        Assert.assertEquals(response.print(), "Internal Server Error");
     }
 
 }
